@@ -1,26 +1,23 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
 const axios = require('axios');
-const path = require('path');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// ✅ Proper CORS config for Netlify frontend
-const corsOptions = {
-  origin: 'https://code-commenter-frontend.netlify.app',
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-  credentials: true,
-};
+// ✅ Manually set CORS headers
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://code-commenter-frontend.netlify.app");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  next();
+});
 
-app.use(cors(corsOptions));
-app.options('/explain', cors(corsOptions)); // ✅ Handle preflight
+// ✅ Handle preflight requests
+app.options('/explain', (req, res) => {
+  res.sendStatus(200);
+});
 
 app.use(express.json());
-
-// Optional: remove or change this if not needed in production
-// app.use(express.static(path.join("C:/Users/User/Desktop/Capaciti Demand Programme 2/Projects/code-commenter")));
 
 const COHERE_API_KEY = process.env.COHERE_API_KEY;
 
@@ -45,8 +42,6 @@ app.post('/explain', async (req, res) => {
       }
     );
 
-    console.log("Raw response:", response.data);
-
     const comment = response.data.generations?.[0]?.text?.trim() || "No explanation found.";
     res.json({ comment });
   } catch (error) {
@@ -63,5 +58,5 @@ app.post('/explain', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
