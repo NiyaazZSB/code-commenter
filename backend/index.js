@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.static(path.join("C:/Users/User/Desktop/Capaciti Demand Programme 2/Projects/code-commenter")));
 
 const COHERE_API_KEY = process.env.COHERE_API_KEY;
-console.log("API KEY:", process.env.COHERE_API_KEY);
+//console.log("API KEY:", process.env.COHERE_API_KEY);
 
 
 app.post('/explain', async (req, res) => {
