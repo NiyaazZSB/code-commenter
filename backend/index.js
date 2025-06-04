@@ -6,13 +6,23 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+// ✅ Proper CORS config for Netlify frontend
+const corsOptions = {
+  origin: 'https://code-commenter-frontend.netlify.app',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options('/explain', cors(corsOptions)); // ✅ Handle preflight
+
 app.use(express.json());
-app.use(express.static(path.join("C:/Users/User/Desktop/Capaciti Demand Programme 2/Projects/code-commenter")));
+
+// Optional: remove or change this if not needed in production
+// app.use(express.static(path.join("C:/Users/User/Desktop/Capaciti Demand Programme 2/Projects/code-commenter")));
 
 const COHERE_API_KEY = process.env.COHERE_API_KEY;
-//console.log("API KEY:", process.env.COHERE_API_KEY);
-
 
 app.post('/explain', async (req, res) => {
   try {
@@ -22,7 +32,7 @@ app.post('/explain', async (req, res) => {
     const response = await axios.post(
       'https://api.cohere.ai/v1/generate',
       {
-        model: 'command', // Use 'command' for most accounts
+        model: 'command',
         prompt: `Explain what the following code does:\n${code}`,
         max_tokens: 1000,
         temperature: 0.5,
