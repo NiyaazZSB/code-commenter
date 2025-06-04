@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "functions": {
+    "api/explain-code.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
