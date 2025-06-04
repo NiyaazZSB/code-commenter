@@ -1,29 +1,220 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  display: flex;
-  justify-content: center;
-  padding: 30px;
+/* Tailwind config and custom animations */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations and keyframes */
+@keyframes gradient {
+    0%, 100% {
+        background-size: 200% 200%;
+        background-position: left center;
+    }
+    50% {
+        background-size: 200% 200%;
+        background-position: right center;
+    }
 }
-.container {
-  width: 600px;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
+
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(0px); 
+    }
+    50% { 
+        transform: translateY(-10px); 
+    }
 }
-textarea {
-  width: 100%;
-  height: 200px;
-  font-family: monospace;
-  font-size: 14px;
+
+@keyframes pulse-glow {
+    0% { 
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); 
+    }
+    100% { 
+        box-shadow: 0 0 40px rgba(139, 92, 246, 0.6); 
+    }
 }
+
+@keyframes typing {
+    0%, 50% { 
+        opacity: 1; 
+    }
+    51%, 100% { 
+        opacity: 0; 
+    }
+}
+
+/* Custom utility classes */
+.animate-gradient {
+    animation: gradient 6s ease infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+.animate-typing {
+    animation: typing 2s steps(20) infinite;
+}
+
+/* Glass effect */
+.glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Code editor styling */
+.code-editor:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+/* Loading dots animation */
+.loading-dots::after {
+    content: '';
+    animation: typing 1.5s steps(4) infinite;
+}
+
+.loading-dots::before {
+    content: '...';
+    position: absolute;
+}
+
+/* Tailwind configuration inline */
+:root {
+    --animate-gradient: gradient 6s ease infinite;
+    --animate-float: float 3s ease-in-out infinite;
+    --animate-pulse-glow: pulse-glow 2s ease-in-out infinite alternate;
+    --animate-typing: typing 2s steps(20) infinite;
+}
+
+/* Ensure smooth transitions */
+* {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar for textarea */
+.code-editor::-webkit-scrollbar {
+    width: 8px;
+}
+
+.code-editor::-webkit-scrollbar-track {
+    background: #374151;
+    border-radius: 4px;
+}
+
+.code-editor::-webkit-scrollbar-thumb {
+    background: #6B7280;
+    border-radius: 4px;
+}
+
+.code-editor::-webkit-scrollbar-thumb:hover {
+    background: #9CA3AF;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .glass-effect {
+        padding: 1.5rem;
+    }
+    
+    .text-5xl {
+        font-size: 2.5rem;
+    }
+    
+    .text-xl {
+        font-size: 1.125rem;
+    }
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #8B5CF6;
+    outline-offset: 2px;
+}
+
+/* Button hover effects */
 button {
-  margin-top: 10px;
-  padding: 10px 20px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-pre {
-  margin-top: 20px;
-  background-color: #eee;
-  padding: 10px;
-  white-space: pre-wrap;
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Disabled button styles */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Output section styling */
+#output {
+    transition: opacity 0.3s ease;
+}
+
+#output pre {
+    font-family: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Loading state animations */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Feature cards hover effect */
+.glass-effect:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Typography improvements */
+.font-mono {
+    font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', Consolas, 'Courier New', monospace;
+}
+
+/* Gradient text effect */
+.bg-gradient-to-r {
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+/* Ensure proper contrast */
+.text-transparent {
+    color: transparent;
+}
+
+/* Animation delays for floating elements */
+.animate-float:nth-child(2) {
+    animation-delay: 2s;
+}
+
+.animate-float:nth-child(3) {
+    animation-delay: 4s;
 }
