@@ -31,7 +31,7 @@ app.post('/explain', async (req, res) => {
       {
         model: 'command',
         prompt: `Explain what the following code does:\n${code}`,
-        max_tokens: 10000,
+        max_tokens: 2000,
         temperature: 0.5,
       },
       {
