@@ -4,7 +4,7 @@ async function generateComment() {
   output.textContent = "Analyzing code...";
 
   try {
-    const response = await fetch("http://localhost:3000/explain", {
+    const response = await fetch("https://code-commenter.onrender.com/explain", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code }),
