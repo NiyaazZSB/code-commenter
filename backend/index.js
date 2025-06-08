@@ -1,21 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
+const cors = require('cors'); // <-- Add this line
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ Manually set CORS headers
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://code-commenter-frontend.netlify.app");
-  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  next();
-});
-
-// ✅ Handle preflight requests
-app.options('/explain', (req, res) => {
-  res.sendStatus(200);
-});
+// Use the cors middleware for your frontend origin
+app.use(cors({
+  origin: 'https://code-commenter-frontend.netlify.app'
+}));
 
 app.use(express.json());
 
@@ -46,6 +39,43 @@ app.post('/explain', async (req, res) => {
     res.json({ comment });
   } catch (error) {
     console.error("Error generating comment:");
+    if (error.response) {
+      console.error("Status:", error.response.status);
+      console.error("Data:", error.response.data);
+      res.status(500).json({ error: error.response.data });
+    } else {
+      console.error("Message:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  }
+});
+
+// Add the /chat endpoint
+app.post('/chat', async (req, res) => {
+  try {
+    const chatMessage = req.body.message;
+    console.log("Received chat message:", chatMessage);
+
+    const response = await axios.post(
+      'https://api.cohere.ai/v1/generate',
+      {
+        model: 'command',
+        prompt: `User: ${chatMessage}\nAI:`,
+        max_tokens: 500,
+        temperature: 0.7,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${COHERE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    const aiResponse = response.data.generations?.[0]?.text?.trim() || "I couldn't process that chat message.";
+    res.json({ reply: aiResponse });
+  } catch (error) {
+    console.error("Error processing chat message:");
     if (error.response) {
       console.error("Status:", error.response.status);
       console.error("Data:", error.response.data);
