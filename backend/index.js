@@ -53,14 +53,27 @@ app.post('/explain', async (req, res) => {
 // Add the /chat endpoint
 app.post('/chat', async (req, res) => {
   try {
-    const chatMessage = req.body.message;
-    console.log("Received chat message:", chatMessage);
+    const { message, history } = req.body;
+    console.log("Received chat message:", message);
+
+    // Build conversation prompt
+    let prompt = '';
+    if (Array.isArray(history)) {
+      for (const entry of history) {
+        if (entry.sender === 'user') {
+          prompt += `User: ${entry.message}\n`;
+        } else {
+          prompt += `AI: ${entry.message}\n`;
+        }
+      }
+    }
+    prompt += `User: ${message}\nAI:`;
 
     const response = await axios.post(
       'https://api.cohere.ai/v1/generate',
       {
         model: 'command',
-        prompt: `User: ${chatMessage}\nAI:`,
+        prompt,
         max_tokens: 500,
         temperature: 0.7,
       },
@@ -72,9 +85,8 @@ app.post('/chat', async (req, res) => {
       }
     );
 
-    
     const aiResponse = response.data.generations?.[0]?.text?.trim() || "I couldn't process that chat message.";
-    res.json({ response: aiResponse }); // <-- Change 'reply' to 'response'
+    res.json({ response: aiResponse });
 
   } catch (error) {
     console.error("Error processing chat message:");
@@ -88,7 +100,6 @@ app.post('/chat', async (req, res) => {
     }
   }
 });
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
