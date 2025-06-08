@@ -72,8 +72,10 @@ app.post('/chat', async (req, res) => {
       }
     );
 
+    
     const aiResponse = response.data.generations?.[0]?.text?.trim() || "I couldn't process that chat message.";
-    res.json({ reply: aiResponse });
+    res.json({ response: aiResponse }); // <-- Change 'reply' to 'response'
+
   } catch (error) {
     console.error("Error processing chat message:");
     if (error.response) {
