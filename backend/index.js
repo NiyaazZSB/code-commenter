@@ -73,9 +73,9 @@ app.post('/chat', async (req, res) => {
       'https://api.cohere.ai/v1/generate',
       {
         model: 'command',
-        prompt,
-        max_tokens: 500,
-        temperature: 0.7,
+        prompt: `Explain what the following code does:\n${code}`,
+        max_tokens: 2000,
+        temperature: 0.5,
       },
       {
         headers: {
