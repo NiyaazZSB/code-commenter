@@ -56,8 +56,8 @@ app.post('/chat', async (req, res) => {
     const { message, history } = req.body;
     console.log("Received chat message:", message);
 
-    // Build conversation prompt
-    let prompt = '';
+    // Build conversation prompt with coding-only instruction
+    let prompt = 'You are a helpful coding assistant. Only answer questions related to programming, code, or software development. If the question is not about code, politely say you can only help with coding topics.\n';
     if (Array.isArray(history)) {
       for (const entry of history) {
         if (entry.sender === 'user') {
