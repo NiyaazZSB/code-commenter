@@ -818,6 +818,126 @@ function setupEventListeners() {
     });
 }
 
+// Chat functionality
+let chatHistory = [];
+
+async function sendChatMessage() {
+    const chatInput = document.getElementById('chatInput');
+    const chatMessages = document.getElementById('chatMessages');
+    const sendBtn = document.getElementById('sendChatBtn');
+    
+    const message = chatInput.value.trim();
+    if (!message) return;
+    
+    // Disable input and button
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = `
+        <div class="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+    `;
+    
+    // Add user message to chat
+    addMessageToChat('user', message);
+    chatInput.value = '';
+    
+    try {
+        const response = await fetch('https://code-commenter-backend.onrender.com/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                history: chatHistory
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Add AI response to chat
+        addMessageToChat('ai', data.response);
+        
+    } catch (error) {
+        console.error('Error sending chat message:', error);
+        addMessageToChat('ai', 'Sorry, I encountered an error. Please try again.');
+    }
+    
+    // Re-enable input and button
+    chatInput.disabled = false;
+    sendBtn.disabled = false;
+    sendBtn.innerHTML = `
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+        </svg>
+    `;
+    chatInput.focus();
+}
+
+function addMessageToChat(sender, message) {
+    const chatMessages = document.getElementById('chatMessages');
+    
+    // Remove empty state if it exists
+    if (chatMessages.querySelector('.text-center')) {
+        chatMessages.innerHTML = '';
+    }
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `mb-4 ${sender === 'user' ? 'flex justify-end' : 'flex justify-start'}`;
+    
+    const messageContent = document.createElement('div');
+    messageContent.className = `max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+        sender === 'user' 
+            ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white' 
+            : 'bg-accent text-primary border border-accent'
+    }`;
+    
+    // Add sender label and message
+    messageContent.innerHTML = `
+        <div class="text-xs opacity-75 mb-1">${sender === 'user' ? 'You' : 'AI Assistant'}</div>
+        <div class="text-sm leading-relaxed">${escapeHtml(message)}</div>
+    `;
+    
+    messageDiv.appendChild(messageContent);
+    chatMessages.appendChild(messageDiv);
+    
+    // Add to chat history
+    chatHistory.push({ sender, message });
+    
+    // Scroll to bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function handleChatKeyPress(event) {
+    if (event.key === 'Enter') {
+        sendChatMessage();
+    }
+}
+
+function clearChat() {
+    const chatMessages = document.getElementById('chatMessages');
+    chatHistory = [];
+    
+    chatMessages.innerHTML = `
+        <div class="text-center text-secondary py-8">
+            <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+            <p class="text-sm">Start a conversation about your code!</p>
+            <p class="text-xs mt-1">Ask questions about programming, debugging, best practices, and more.</p>
+        </div>
+    `;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Debounce utility
 function debounce(func, wait) {
     let timeout;
