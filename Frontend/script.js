@@ -895,10 +895,13 @@ function addMessageToChat(sender, message) {
             : 'bg-accent text-primary border border-accent'
     }`;
     
+    // Process message for code blocks and formatting
+    const formattedMessage = formatMessageContent(message);
+    
     // Add sender label and message
     messageContent.innerHTML = `
         <div class="text-xs opacity-75 mb-1">${sender === 'user' ? 'You' : 'AI Assistant'}</div>
-        <div class="text-sm leading-relaxed">${escapeHtml(message)}</div>
+        <div class="text-sm leading-relaxed">${formattedMessage}</div>
     `;
     
     messageDiv.appendChild(messageContent);
@@ -909,6 +912,25 @@ function addMessageToChat(sender, message) {
     
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function formatMessageContent(message) {
+    // Escape HTML first
+    let formatted = escapeHtml(message);
+    
+    // Handle code blocks (triple backticks)
+    formatted = formatted.replace(/```(\w+)?\n?([\s\S]*?)```/g, (match, language, code) => {
+        const lang = language ? ` data-language="${language}"` : '';
+        return `<div class="bg-surface border border-accent rounded-lg p-3 mt-2 mb-2 font-mono text-sm overflow-x-auto"${lang}><pre class="whitespace-pre-wrap">${code.trim()}</pre></div>`;
+    });
+    
+    // Handle inline code (single backticks)
+    formatted = formatted.replace(/`([^`]+)`/g, '<code class="bg-surface px-1 py-0.5 rounded text-sm font-mono border border-accent">$1</code>');
+    
+    // Handle line breaks
+    formatted = formatted.replace(/\n/g, '<br>');
+    
+    return formatted;
 }
 
 function handleChatKeyPress(event) {
