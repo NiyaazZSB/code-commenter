@@ -9,6 +9,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({
   origin: 'https://code-commenter-frontend.netlify.app'
 }));
+// Handle preflight OPTIONS requests for all routes
+app.options('*', cors({
+  origin: 'https://code-commenter-frontend.netlify.app'
+}));
 
 app.use(express.json());
 
