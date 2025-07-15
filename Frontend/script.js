@@ -895,13 +895,13 @@ function addMessageToChat(sender, message) {
             : 'bg-accent text-primary border border-accent'
     }`;
     
-    // Process message for code blocks and formatting
-    const formattedMessage = formatMessageContent(message);
+    // Use the EXACT same formatting as AI Analysis
+    const formattedMessage = formatOutput(message);
     
     // Add sender label and message
     messageContent.innerHTML = `
         <div class="text-xs opacity-75 mb-1">${sender === 'user' ? 'You' : 'AI Assistant'}</div>
-        <div class="text-sm leading-relaxed formatted-output">${formattedMessage}</div>
+        <div class="text-sm leading-relaxed"><div class="formatted-output">${formattedMessage}</div></div>
     `;
     
     messageDiv.appendChild(messageContent);
@@ -912,19 +912,6 @@ function addMessageToChat(sender, message) {
     
     // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function formatMessageContent(message) {
-    // Use the same formatting as AI Analysis output
-    let formatted = message
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`(.*?)`/g, '<code>$1</code>')
-        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>');
-    
-    return `<p>${formatted}</p>`;
 }
 
 function handleChatKeyPress(event) {
