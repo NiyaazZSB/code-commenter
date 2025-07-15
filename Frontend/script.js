@@ -841,7 +841,7 @@ async function sendChatMessage() {
     chatInput.value = '';
     
     try {
-        const response = await fetch('https://code-commenter-backend.onrender.com/chat', {
+        const response = await fetch('https://code-commenter.onrender.com/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
