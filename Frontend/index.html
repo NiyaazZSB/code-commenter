@@ -3,62 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Favicon using inline SVG with laptop-code icon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><path fill='white' d='M15 25c0-2.8 2.2-5 5-5h60c2.8 0 5 2.2 5 5v40h-5V25H20v40h-5V25zM10 78.2c0-.8.7-1.5 1.5-1.5h77c.8 0 1.5.7 1.5 1.5 0 3.3-2.7 6-6 6H16c-3.3 0-6-2.7-6-6zM35 41l-4 4 4 4c.7.7.7 1.8 0 2.5s-1.8.7-2.5 0l-6-6c-.7-.7-.7-1.8 0-2.5l6-6c.7-.7 1.8-.7 2.5 0s.7 1.8 0 2.5zM65 35l6 6c.7.7.7 1.8 0 2.5l-6 6c-.7.7-1.8.7-2.5 0s-.7-1.8 0-2.5l4-4-4-4c-.7-.7-.7-1.8 0-2.5s1.8-.7 2.5 0z'/></svg>">
-    <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><path fill='white' d='M15 25c0-2.8 2.2-5 5-5h60c2.8 0 5 2.2 5 5v40h-5V25H20v40h-5V25zM10 78.2c0-.8.7-1.5 1.5-1.5h77c.8 0 1.5.7 1.5 1.5 0 3.3-2.7 6-6 6H16c-3.3 0-6-2.7-6-6zM35 41l-4 4 4 4c.7.7.7 1.8 0 2.5s-1.8.7-2.5 0l-6-6c-.7-.7-.7-1.8 0-2.5l6-6c.7-.7 1.8-.7 2.5 0s.7 1.8 0 2.5zM65 35l6 6c.7.7.7 1.8 0 2.5l-6 6c-.7.7-1.8.7-2.5 0s-.7-1.8 0-2.5l4-4-4-4c-.7-.7-.7-1.8 0-2.5s1.8-.7 2.5 0z'/></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><path fill='white' d='M15 25c0-2.8 2.2-5 5-5h60c2.8 0 5 2.2 5 5v40h-5V25H20v40h-5V25zM10 78.2c0-.8.7-1.5 1.5-1.5h77c.8 0 1.5.7 1.5 1.5 0 3.3-2.7 6-6 6H16c-3.3 0-6-2.7-6-6zM35 41l-4 4 4 4c.7.7.7 1.8 0 2.5s-1.8.7-2.5 0l-6-6c-.7-.7-.7-1.8 0-2.5l6-6c.7-.7 1.8-.7 2.5 0s.7 1.8 0 2.5zM65 35l6 6c.7.7.7 1.8 0 2.5l-6 6c-.7.7-1.8.7-2.5 0s-.7-1.8 0-2.5l4-4-4-4c-.7-.7-.7-1.8 0-2.5s1.8-.7 2.5 0z'/></svg>">
+    <meta name="description" content="AI-powered code analysis and documentation tool">
     <title>Code Commenter - AI-Powered Code Analysis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" id="dynamic-favicon" href="">
+    <script>
+    // Set favicon to black-and-white SVG
+    fetch('./laptop-code-solid.svg')
+      .then(res => res.text())
+      .then(svgText => {
+        // Force all fills to black
+        let bwSvg = svgText.replace(/fill="(#[^\"]*|currentColor|white|[a-zA-Z]+)"/gi, 'fill="black"');
+        bwSvg = bwSvg.replace(/<path /, '<path fill="black" ');
+        const svg64 = btoa(bwSvg);
+        const faviconUrl = 'data:image/svg+xml;base64,' + svg64;
+        document.getElementById('dynamic-favicon').setAttribute('href', faviconUrl);
+      });
+    </script>
+    <style>
+      /* Overlay for content contrast */
+      body .main-contrast-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        transition: background 0.3s;
+      }
+      body[data-theme="dark"] .main-contrast-bg {
+        background: rgba(21,28,44,0.82);
+      }
+      body[data-theme="light"] .main-contrast-bg {
+        background: rgba(255,255,255,0.82);
+      }
+      main.relative {
+        position: relative;
+        z-index: 1;
+      }
+    </style>
 </head>
 <body class="min-h-screen transition-all duration-500" data-theme="dark">
-    <!-- Background Effects -->
-    <div class="fixed inset-0 overflow-hidden pointer-events-none background-effects">
-        <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
-        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 2s;"></div>
-        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 4s;"></div>
-    </div>
-
-    <div class="relative z-10 animated-container mx-auto px-4 py-8" style="max-width: 1280px;">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <div class="flex justify-between items-start mb-6">
+    <div class="main-contrast-bg"></div>
+    <!-- Animated Laptop Icon Background will be set by JS -->
+    <main class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header Section -->
+        <header class="text-center mb-12">
+            <nav class="flex justify-between items-start mb-6">
                 <div class="flex-1"></div>
                 <div class="flex-1 flex justify-center">
-                    <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl animate-pulse-glow">
+                    <div class="logo inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-blue-500 rounded-2xl animate-pulse-glow">
                         <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
                         </svg>
                     </div>
                 </div>
                 <div class="flex-1 flex justify-end">
-                    <!-- Theme Toggle Button -->
                     <button 
                         id="themeToggle"
-                        class="theme-toggle-btn glass-effect rounded-xl p-3 hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50"
-                        aria-label="Toggle theme"
+                        class="theme-toggle-btn glass-effect rounded-xl p-3 hover:scale-105 transition-all duration-300"
+                        aria-label="Toggle dark/light theme"
                     >
-                        <svg class="w-6 h-6 theme-icon-sun hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 theme-icon-sun hidden" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                        <svg class="w-6 h-6 theme-icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 theme-icon-moon" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                         </svg>
                     </button>
                 </div>
-            </div>
+            </nav>
             
-            <h1 class="text-5xl font-bold mb-4 gradient-text">
-                Code Commenter
-            </h1>
+            <h1 class="text-5xl font-bold mb-4 gradient-text">Code Commenter</h1>
             <p class="text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
                 Unlock the secrets of your code with AI-powered analysis. Get instant explanations, insights, and documentation.
             </p>
-        </div>
+        </header>
 
         <!-- Main Interface -->
         <div class="max-w-6xl mx-auto">
-            <div class="grid lg:grid-cols-2 gap-8">
+            <div id="grid" class="grid lg:grid-cols-2 gap-8">
                 <!-- Input Section -->
                 <div class="glass-effect rounded-3xl p-8 shadow-2xl">
                     <div class="flex items-center justify-between mb-6">
@@ -68,7 +90,6 @@
                             <div class="w-3 h-3 bg-green-500 rounded-full mr-4"></div>
                             <span class="text-secondary font-mono text-sm">Code Input</span>
                         </div>
-                        
                         <!-- Language Detector -->
                         <div id="languageDetector" class="hidden">
                             <span class="text-xs text-secondary bg-accent rounded-full px-3 py-1">
@@ -80,7 +101,7 @@
                     <!-- Tab Navigation -->
                     <div class="tab-navigation mb-4">
                         <div class="flex space-x-1 bg-surface rounded-2xl p-1">
-                            <button 
+                            <button id="codeTabBtn"
                                 class="tab-btn active flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
                                 data-tab="code"
                             >
@@ -89,7 +110,7 @@
                                 </svg>
                                 Code Input
                             </button>
-                            <button 
+                            <button id="fileTabBtn"
                                 class="tab-btn flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
                                 data-tab="file"
                             >
@@ -98,14 +119,14 @@
                                 </svg>
                                 File Upload
                             </button>
-                            <button 
+                            <button id="chatTabBtn"
                                 class="tab-btn flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
                                 data-tab="chat"
                             >
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
                                 </svg>
-                                Chat
+                                AI Chat
                             </button>
                         </div>
                     </div>
@@ -116,10 +137,10 @@
                             id="codeInput" 
                             class="code-editor w-full h-80 bg-surface text-primary p-6 rounded-2xl font-mono text-sm leading-relaxed resize-none border-0 transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
                             placeholder="// Paste your code here...
-function fibonacci(n) {
-    if (n <= 1) return n;
-    return fibonacci(n-1) + fibonacci(n-2);
-}"
+        function fibonacci(n) {
+            if (n <= 1) return n;
+            return fibonacci(n-1) + fibonacci(n-2);
+        }"
                             spellcheck="false"
                         ></textarea>
                     </div>
@@ -127,7 +148,7 @@ function fibonacci(n) {
                     <!-- File Upload Tab -->
                     <div id="fileTab" class="tab-content hidden">
                         <div class="file-upload-zone">
-                            <input type="file" id="fileInput" class="hidden" accept=".js,.py,.java,.cpp,.c,.html,.css,.php,.rb,.go,.rs,.ts,.jsx,.tsx,.vue,.svelte" multiple>
+                            <input type="file" id="fileInput" multiple>
                             
                             <div 
                                 id="dropZone" 
@@ -158,51 +179,6 @@ function fibonacci(n) {
                         </div>
                     </div>
                     
-                    <!-- Chat Tab -->
-                    <div id="chatTab" class="tab-content hidden">
-                        <div class="chat-container">
-                            <!-- Chat Messages -->
-                            <div id="chatMessages" class="h-64 bg-surface rounded-2xl p-4 overflow-y-auto mb-4 border border-accent">
-                                <div class="text-center text-secondary py-8">
-                                    <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                                    </svg>
-                                    <p class="text-sm">Start a conversation about your code!</p>
-                                    <p class="text-xs mt-1">Ask questions about programming, debugging, best practices, and more.</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Chat Input -->
-                            <div class="flex gap-3">
-                                <input 
-                                    type="text" 
-                                    id="chatInput"
-                                    placeholder="Ask me anything about coding..."
-                                    class="flex-1 bg-surface text-primary p-3 rounded-xl border border-accent focus:border-purple-500 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-all duration-300"
-                                    onkeypress="handleChatKeyPress(event)"
-                                >
-                                <button 
-                                    id="sendChatBtn"
-                                    onclick="sendChatMessage()"
-                                    class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white p-3 rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50"
-                                >
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            
-                            <!-- Clear Chat Button -->
-                            <button 
-                                id="clearChatBtn"
-                                onclick="clearChat()"
-                                class="mt-3 w-full bg-accent hover:bg-accent-hover text-secondary font-medium py-2 px-4 rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
-                            >
-                                Clear Chat History
-                            </button>
-                        </div>
-                    </div>
-                    
                     <div class="mt-6 flex flex-col sm:flex-row gap-4">
                         <button 
                             id="analyzeBtn"
@@ -219,10 +195,52 @@ function fibonacci(n) {
                         
                         <button 
                             onclick="clearCode()" 
-                            class="bg-accent hover:bg-accent-hover text-secondary font-semibold py-4 px-6 rounded-2xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
+                            class="bg-accent hover:bg-accent-hover text-secondary font-semibold py-5 px-8 rounded-2xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
                         >
                             Clear
-                        </button>
+                        </button>                    </div>
+                    
+                    <!-- Chat Tab -->
+                    <div id="chatTab" class="tab-content hidden">
+                        <div id="chatMessages" class="chat-messages bg-surface p-6 rounded-2xl h-[400px] overflow-y-auto mb-8 space-y-6">
+                            <div class="text-center text-secondary py-8">
+                                <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 20l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"></path>
+                                </svg>
+                                <p class="text-sm">Start a conversation about code!</p>
+                                <p class="text-xs text-gray-400 mt-1">Ask questions, get explanations, discuss best practices</p>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input-container mt-6">
+                            <div class="flex gap-2">
+                                <textarea 
+                                    id="chatInput"
+                                    class="flex-1 bg-surface text-primary p-3 rounded-xl text-sm resize-none border-0 transition-all duration-300 focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                                    placeholder="Ask me anything about code..."
+                                    rows="2"
+                                    spellcheck="false"
+                                ></textarea>
+                                <button 
+                                    id="sendChatBtn"
+                                    onclick="sendChatMessage()" 
+                                    class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-6 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 flex gap-4">
+                            <button 
+                                onclick="clearChat()" 
+                                class="bg-accent hover:bg-accent-hover text-secondary font-semibold py-3 px-6 rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-500 focus:ring-opacity-50"
+                            >
+                                Clear Chat
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -237,7 +255,6 @@ function fibonacci(n) {
                             </div>
                             <span class="text-primary font-semibold">AI Analysis</span>
                         </div>
-                        
                         <div id="statusIndicator" class="hidden">
                             <div class="flex items-center text-secondary">
                                 <div class="animate-spin rounded-full h-4 w-4 border-2 border-purple-500 border-t-transparent mr-2"></div>
@@ -280,39 +297,128 @@ function fibonacci(n) {
         </div>
 
         <!-- Features Section -->
-        <div class="mt-20 grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <div class="glass-effect rounded-2xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300">
-                <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-primary font-semibold mb-2">Lightning Fast</h3>
-                <p class="text-secondary text-sm">Get instant code explanations powered by advanced AI algorithms</p>
+        <section class="mt-20" aria-labelledby="features-heading">
+            <h2 id="features-heading" class="sr-only">Features</h2>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Feature Card 1 -->
+                <article class="feature-card glass-effect rounded-2xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-red-500 to-purple-500 rounded-2xl flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                <path d="M11.625 16.5a1.875 1.875 0 1 0 0-3.75 1.875 1.875 0 0 0 0 3.75Z" />
+                                <path fill-rule="evenodd" d="M5.625 1.5H9a3.75 3.75 0 0 1 3.75 3.75v1.875c0 1.036.84 1.875 1.875 1.875H16.5a3.75 3.75 0 0 1 3.75 3.75v7.875c0 1.035-.84 1.875-1.875 1.875H5.625a1.875 1.875 0 0 1-1.875-1.875V3.375c0-1.036.84-1.875 1.875-1.875Zm6 16.5c.66 0 1.277-.19 1.797-.518l1.048 1.048a.75.75 0 0 0 1.06-1.06l-1.047-1.048A3.375 3.375 0 1 0 11.625 18Z" clip-rule="evenodd" />
+                                <path d="M14.25 5.25a5.23 5.23 0 0 0-1.279-3.434 9.768 9.768 0 0 1 6.963 6.963A5.23 5.23 0 0 0 16.5 7.5h-1.875a.375.375 0 0 1-.375-.375V5.25Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2 text-primary">AI Code Analysis</h3>
+                    <p class="text-secondary text-sm">Get instant explanations and comments for your code using advanced AI models.</p>
+                </article>
+                <!-- Feature Card 2 -->
+                <article class="feature-card glass-effect rounded-2xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-2xl flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2 text-primary">Multi-Language Support</h3>
+                    <p class="text-secondary text-sm">Analyze code in JavaScript, Python, Java, C++, HTML, CSS, and many more languages.</p>
+                </article>
+                <!-- Feature Card 3 -->
+                <article class="feature-card glass-effect rounded-2xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2 text-primary">Interactive AI Chat</h3>
+                    <p class="text-secondary text-sm">Ask questions about your code, get best practices, and discuss solutions with the built-in AI chat.</p>
+                </article>
             </div>
-            
-            <div class="glass-effect rounded-2xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300">
-                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-primary font-semibold mb-2">Multi-Language</h3>
-                <p class="text-secondary text-sm">Supports all major programming languages and frameworks</p>
-            </div>
-            
-            <div class="glass-effect rounded-2xl p-6 text-center hover:transform hover:scale-105 transition-all duration-300">
-                <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                    </svg>
-                </div>
-                <h3 class="text-primary font-semibold mb-2">Detailed Insights</h3>
-                <p class="text-secondary text-sm">Get comprehensive explanations with best practices and tips</p>
-            </div>
-        </div>
-    </div>
-
+        </section>
+    </main>
+    <script>
+    // Animated diagonal laptop icon background
+    (function() {
+      const TILE_SIZE = 120;
+      const LOGO_SIZE = 64;
+      // Detect theme and set colors
+      function getThemeColors() {
+        const isDark = document.body.getAttribute('data-theme') === 'dark';
+        return isDark
+          ? { bg: '#151c2c', icon: '#a020f0' }
+          : { bg: '#f3f4f6', icon: '#a020f0' }; // Adjust bg/icon for light mode if needed
+      }
+      function drawBackground() {
+        const { bg: BG_COLOR, icon: PURPLE } = getThemeColors();
+        const LOGO_SRC = './laptop-code-solid.svg';
+        const body = document.body;
+        const canvas = document.createElement('canvas');
+        canvas.width = TILE_SIZE;
+        canvas.height = TILE_SIZE;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, TILE_SIZE, TILE_SIZE);
+          ctx.fillStyle = BG_COLOR;
+          ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+          fetch(LOGO_SRC)
+            .then(res => res.text())
+            .then(svgText => {
+              let coloredSvg = svgText.replace(/fill="(#[^\"]*|currentColor|white)"/gi, `fill=\"${PURPLE}\"`);
+              coloredSvg = coloredSvg.replace(/<path /, `<path fill=\"${PURPLE}\" `);
+              const svg64 = btoa(coloredSvg);
+              const image64 = 'data:image/svg+xml;base64,' + svg64;
+              const img = new window.Image();
+              img.src = image64;
+              img.onload = () => {
+                ctx.globalAlpha = 0.95; // Slightly less transparent for more visible icon
+                ctx.drawImage(
+                  img,
+                  (TILE_SIZE - LOGO_SIZE) / 2,
+                  (TILE_SIZE - LOGO_SIZE) / 2,
+                  LOGO_SIZE,
+                  LOGO_SIZE
+                );
+                ctx.globalAlpha = 1;
+                body.style.backgroundImage = `url('${canvas.toDataURL()}')`;
+                body.style.backgroundRepeat = 'repeat';
+                body.style.backgroundSize = `${TILE_SIZE}px ${TILE_SIZE}px`;
+              };
+              img.onerror = () => {
+                console.error('Could not load laptop icon image:', LOGO_SRC);
+              };
+            });
+        }
+        body.style.backgroundColor = BG_COLOR;
+      }
+      // Initial draw
+      drawBackground();
+      // Animation
+      const style = document.createElement('style');
+      style.innerHTML = `@keyframes laptop-diagonal-move { 0% { background-position: 0 0; } 100% { background-position: ${TILE_SIZE}px ${TILE_SIZE}px; } }`;
+      document.head.appendChild(style);
+      document.body.style.animation = 'laptop-diagonal-move 18s linear infinite';
+      // Listen for theme changes (if your theme toggle updates data-theme)
+      const observer = new MutationObserver(() => {
+        drawBackground();
+      });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+      // Clean up on unload
+      window.addEventListener('beforeunload', function() {
+        document.body.style.backgroundImage = '';
+        document.body.style.backgroundRepeat = '';
+        document.body.style.backgroundSize = '';
+        document.body.style.backgroundColor = '';
+        document.body.style.animation = '';
+        document.head.removeChild(style);
+        observer.disconnect();
+      });
+    })();
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
