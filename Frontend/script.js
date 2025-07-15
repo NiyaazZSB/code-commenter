@@ -1,6 +1,127 @@
 let isAnalyzing = false;
 let currentFiles = [];
 
+// Animated Background Setup
+function initializeAnimatedBackground() {
+    const TILE_SIZE = 120;
+    const CONTAINER_TILE_SIZE = 80;
+    const LOGO_SIZE = 64;
+    const CONTAINER_LOGO_SIZE = 48;
+    const body = document.body;
+    
+    // Get current theme colors
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    const BG_COLOR = isDark ? '#0f172a' : '#ffffff';
+    const LOGO_COLOR = isDark ? 'rgba(139, 92, 246, 0.25)' : 'rgba(139, 92, 246, 0.2)'; // Much more visible purple
+    
+    // Create a pattern tile for body
+    const canvas = document.createElement('canvas');
+    canvas.width = TILE_SIZE;
+    canvas.height = TILE_SIZE;
+    const ctx = canvas.getContext('2d');
+    
+    // Create a pattern tile for container
+    const containerCanvas = document.createElement('canvas');
+    containerCanvas.width = CONTAINER_TILE_SIZE;
+    containerCanvas.height = CONTAINER_TILE_SIZE;
+    const containerCtx = containerCanvas.getContext('2d');
+    
+    if (ctx && containerCtx) {
+        // Create body pattern
+        ctx.fillStyle = BG_COLOR;
+        ctx.fillRect(0, 0, TILE_SIZE, TILE_SIZE);
+        
+        // Create container pattern
+        containerCtx.fillStyle = 'transparent';
+        containerCtx.fillRect(0, 0, CONTAINER_TILE_SIZE, CONTAINER_TILE_SIZE);
+        
+        // Create the laptop-code SVG as an image
+        const svgData = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="${LOGO_SIZE}" height="${LOGO_SIZE}">
+                <path fill="${LOGO_COLOR}" d="M64 96c0-35.3 28.7-64 64-64l384 0c35.3 0 64 28.7 64 64l0 256-64 0 0-256L128 96l0 256-64 0L64 96zM0 403.2C0 392.6 8.6 384 19.2 384l601.6 0c10.6 0 19.2 8.6 19.2 19.2c0 42.4-34.4 76.8-76.8 76.8L76.8 480C34.4 480 0 445.6 0 403.2zM281 209l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-48-48c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM393 175l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z"/>
+            </svg>
+        `;
+        
+        const containerSvgData = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="${CONTAINER_LOGO_SIZE}" height="${CONTAINER_LOGO_SIZE}">
+                <path fill="${LOGO_COLOR}" d="M64 96c0-35.3 28.7-64 64-64l384 0c35.3 0 64 28.7 64 64l0 256-64 0 0-256L128 96l0 256-64 0L64 96zM0 403.2C0 392.6 8.6 384 19.2 384l601.6 0c10.6 0 19.2 8.6 19.2 19.2c0 42.4-34.4 76.8-76.8 76.8L76.8 480C34.4 480 0 445.6 0 403.2zM281 209l-31 31 31 31c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-48-48c-9.4-9.4-9.4-24.6 0-33.9l48-48c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9zM393 175l48 48c9.4 9.4 9.4 24.6 0 33.9l-48 48c-9.4 9.4-24.6 9.4-33.9 0s-9.4-24.6 0-33.9l31-31-31-31c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0z"/>
+            </svg>
+        `;
+        
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
+        const containerSvgBlob = new Blob([containerSvgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(svgBlob);
+        const containerUrl = URL.createObjectURL(containerSvgBlob);
+        
+        const img = new Image();
+        const containerImg = new Image();
+        
+        let loadedCount = 0;
+        const totalImages = 2;
+        
+        function onImageLoad() {
+            loadedCount++;
+            if (loadedCount === totalImages) {
+                // Draw body pattern
+                ctx.drawImage(
+                    img,
+                    (TILE_SIZE - LOGO_SIZE) / 2,
+                    (TILE_SIZE - LOGO_SIZE) / 2,
+                    LOGO_SIZE,
+                    LOGO_SIZE
+                );
+                
+                // Draw container pattern
+                containerCtx.drawImage(
+                    containerImg,
+                    (CONTAINER_TILE_SIZE - CONTAINER_LOGO_SIZE) / 2,
+                    (CONTAINER_TILE_SIZE - CONTAINER_LOGO_SIZE) / 2,
+                    CONTAINER_LOGO_SIZE,
+                    CONTAINER_LOGO_SIZE
+                );
+                
+                const patternDataUrl = canvas.toDataURL();
+                const containerPatternDataUrl = containerCanvas.toDataURL();
+                
+                // Apply the pattern to body
+                body.style.backgroundImage = `url('${patternDataUrl}')`;
+                body.style.backgroundRepeat = 'repeat';
+                body.style.backgroundSize = `${TILE_SIZE}px ${TILE_SIZE}px`;
+                body.style.animation = 'code-diagonal-move 20s linear infinite';
+                body.classList.add('animated-bg');
+                
+                // Set CSS custom property for container overlay
+                document.documentElement.style.setProperty('--container-bg-pattern', `url('${containerPatternDataUrl}')`);
+                
+                URL.revokeObjectURL(url);
+                URL.revokeObjectURL(containerUrl);
+            }
+        }
+        
+        img.onload = onImageLoad;
+        containerImg.onload = onImageLoad;
+        img.src = url;
+        containerImg.src = containerUrl;
+    }
+    
+    // Add keyframes if not already added
+    if (!document.getElementById('animated-bg-style')) {
+        const style = document.createElement('style');
+        style.id = 'animated-bg-style';
+        style.innerHTML = `
+            @keyframes code-diagonal-move { 
+                0% { background-position: 0 0; } 
+                100% { background-position: ${TILE_SIZE}px ${TILE_SIZE}px; } 
+            }
+            @keyframes code-diagonal-move-overlay { 
+                0% { background-position: 0 0; } 
+                100% { background-position: ${CONTAINER_TILE_SIZE}px ${CONTAINER_TILE_SIZE}px; } 
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
 // Theme Management
 function initializeTheme() {
     const savedTheme = localStorage.getItem('theme');
@@ -9,6 +130,11 @@ function initializeTheme() {
     
     setTheme(theme);
     updateThemeToggle(theme);
+    
+    // Initialize animated background after theme is set
+    setTimeout(() => {
+        initializeAnimatedBackground();
+    }, 100);
 }
 
 function setTheme(theme) {
@@ -34,6 +160,11 @@ function setTheme(theme) {
         root.style.setProperty('--border-color', '#cbd5e1');
         root.style.setProperty('--accent-color', '#6366f1');
     }
+    
+    // Reinitialize animated background with new theme colors
+    setTimeout(() => {
+        initializeAnimatedBackground();
+    }, 100);
 }
 
 function toggleTheme() {
@@ -584,6 +715,7 @@ function initializeApp() {
     initializeTabs();
     initializeFileUpload();
     initializePerformanceMonitoring();
+    initializeAnimatedBackground();
     
     // Set up event listeners
     setupEventListeners();
